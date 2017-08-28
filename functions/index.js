@@ -1,9 +1,35 @@
 var functions = require('firebase-functions');
 var admin = require('firebase-admin');
- 
+
+const nodemailer = require('nodemailer');
+
+const gmailEmail = encodeURIComponent(functions.config().gmail.email);
+const gmailPassword = encodeURIComponent(functions.config().gmail.password);
+const mailTransport = nodemailer.createTransport(
+    `smtps://${gmailEmail}:${gmailPassword}@smtp.gmail.com`);
+
 console.log('No ar');
 
 admin.initializeApp(functions.config().firebase);
+
+exports.sendWelcomeEmail = functions.auth.user().onCreate(event => {
+    console.log(event);
+
+    const mailOptions = {
+        from: '"Firebase Corp." <noreply@firebase.com>',
+        to: event.data.email
+      };
+
+      // The user unsubscribed to the newsletter.
+      mailOptions.subject = 'Benvindo';
+      mailOptions.text = 'Seja benvindo ao BaaS';
+      return mailTransport.sendMail(mailOptions).then(() => {
+        console.log('enviado para:', event.data.email);
+      }).catch(error => {
+        console.error('There was an error while sending the email:', error);  
+      });
+
+});
 
 exports.sendNotification = functions.database.ref('/tarefas/{tarefaId}')
         .onWrite(event => {
