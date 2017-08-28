@@ -20,13 +20,12 @@ exports.sendWelcomeEmail = functions.auth.user().onCreate(event => {
         to: event.data.email
       };
 
-      // The user unsubscribed to the newsletter.
       mailOptions.subject = 'Benvindo';
       mailOptions.text = 'Seja benvindo ao BaaS';
       return mailTransport.sendMail(mailOptions).then(() => {
-        console.log('enviado para:', event.data.email);
+        console.log('Enviado para:', event.data.email);
       }).catch(error => {
-        console.error('There was an error while sending the email:', error);  
+        console.error('Erro no envio de email:', error);  
       });
 
 });
@@ -49,11 +48,8 @@ exports.sendNotification = functions.database.ref('/tarefas/{tarefaId}')
             }
         };
  
-        // Envia uma mensagem para dispositivos inscritos no tópico fornecido.
         return admin.messaging().sendToTopic(topic, payload)
             .then(function (response) {
-                // See the MessagingTopicResponse reference documentation for the
-                // contents of response.
                 console.log("Mensagem enviada com sucesso:", response);
             })
             .catch(function (error) {
